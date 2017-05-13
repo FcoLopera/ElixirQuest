@@ -70,5 +70,6 @@ exports.config = {
                 PIXI: "phaser/dist/pixi",
                 p2: "phaser/dist/p2",
                 Phaser: "phaser"
+    }
   }
 };
