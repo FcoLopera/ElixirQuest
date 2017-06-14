@@ -1,37 +1,59 @@
 
-import {Socket} from "phoenix"
-
-let socket = new Socket("/socket", {params: {token: window.userToken}})
+import {Socket} from 'phoenix'
+import Game from './game'
 
 var Client = {
     eventsQueue : [], // when events arrive before the flag playerIsInitialized is set to true, they are not processed
     // and instead are queued in this array ; they will be processed once the client is initialized and Client.emptyQueue() has been called
     initEventName: 'init', // name of the event that triggers the call to initWorld() and the initialization of the game
     storageNameKey: 'playerName', // key in localStorage of the player name
-    storageIDKey: 'playerID' // key in localStorage of player ID
+    storageIDKey: 'playerID' // key in 0 of player ID
 };
-Client.socket = socket.connect();
+
+//TODO Make use of the example https://github.com/chrismccord/phoenix_chat_example/blob/master/web/static/js/app.js for implement the protocol
+
+// socket creation
+Client.socket = new Socket('/socket', {params: {token: window.userToken, user_id: '123'}})
+
+Client.socket.connect();
+
+//socket logging
+Client.socket.onOpen( ev => console.log('OPEN', ev) )
+Client.socket.onError( ev => console.log('ERROR', ev) )
+Client.socket.onClose( e => console.log('CLOSE', e))
+
+//channel creation
+Client.channel = Client.socket.channel('world:common', {})
+Client.channel.join().receive('ignore', () => console.log('auth error'))
+           .receive('ok', () => console.log('join ok'))
+           //.after(10000, () => console.log('Connection interruption'))
+
+//channel logging
+Client.channel.onError(e => console.log('something went wrong', e))
+Client.channel.onClose(e => console.log('channel closed', e))
+
 
 // The following checks if the game is initialized or not, and based on this either queues the events or process them
 // The original socket.onevent function is copied to onevent. That way, onevent can be used to call the origianl function,
 // whereas socket.onevent can be modified for our purpose!
-var onevent = Client.socket.onevent;
-Client.socket.onevent = function (packet) {
-    if(!Game.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
-        Client.eventsQueue.push(packet);
-    }else{
-        onevent.call(this, packet);    // original call
-    }
-};
+/*
+  var onevent = Client.socket.onevent;
+  Client.socket.onevent = function (packet) {
+      if(!Game.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+          Client.eventsQueue.push(packet);
+      }else{
+          onevent.call(this, packet);    // original call
+      }
+  };
 
-Client.emptyQueue = function(){ // Process the events that have been queued during initialization
-    for(var e = 0; e < Client.eventsQueue.length; e++){
-        onevent.call(Client.socket,Client.eventsQueue[e]);
-    }
-};
-
+  Client.emptyQueue = function(){ // Process the events that have been queued during initialization
+      for(var e = 0; e < Client.eventsQueue.length; e++){
+          onevent.call(Client.socket,Client.eventsQueue[e]);
+      }
+  };
+*/
 Client.requestData = function(){ // request the data to be used for initWorld()
-    Client.socket.emit('init-world',Client.getInitRequest());
+    Client.channel.push('client:init-world',Client.getInitRequest());
 };
 
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
@@ -91,52 +113,52 @@ Client.getName = function(){
     return localStorage.getItem('name');
 };
 
-Client.socket.on('pid',function(playerID){ // the 'pid' event is used for the server to tell the client what is the ID of the player
+Client.channel.on('player:pid',function(playerID){ // the 'pid' event is used for the server to tell the client what is the ID of the player
     Client.setLocalData(playerID);
 });
 
-Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
+Client.channel.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
     if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
-    Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+    Client.channel.push('client:pong',data.stamp); // send back a pong stamp to compute latency
     Game.initWorld(data);
     Game.updateNbConnected(data.nbconnected);
 });
 
-Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)
+Client.channel.on('client:update',function(data){ // This event triggers uppon receiving an update packet (data)
     if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.finalUpdateSchema); // if in binary format, decode first
-    Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
+    Client.channel.push('client:pong',data.stamp);  // send back a pong stamp to compute latency
     if(data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
     if(data.latency) Game.setLatency(data.latency);
     if(data.global) Game.updateWorld(data.global);
     if(data.local) Game.updateSelf(data.local);
 });
 
-Client.socket.on('reset',function(data){
+Client.channel.on('player:reset',function(data){
     // If there is a mismatch between client and server coordinates, this event will reset the client to the server coordinates
     // data contains the correct position of the player
     Game.moveCharacter(Game.player.id,data,0,Game.latency);
 });
 
-Client.socket.on('dbError',function(){
+Client.channel.on('client:dbError',function(){
     // dbError is sent back from the server when the client attempted to connect by sending a player ID that has no match in the database
     localStorage.clear();
     Game.displayError();
 });
 
-Client.socket.on('wait',function(){
+Client.channel.on('client:wait',function(){
     // wait is sent back from the server when the client attempts to connect before the server is done initializing and reading the map
     console.log('Server not ready, re-attempting...');
     setTimeout(Client.requestData, 500); // Just try again in 500ms
 });
 
-Client.socket.on('chat',function(data){
+Client.channel.on('player:chat', function(data){
     // chat is sent by the server when another nearby player has said something
     Game.playerSays(data.id,data.txt);
 });
 
 Client.sendPath = function(path,action,finalOrientation){
     // Send the path that the player intends to travel
-    Client.socket.emit('path',{
+    Client.channel.push('player:path',{
         path:path,
         action:action,
         or:finalOrientation
@@ -146,17 +168,17 @@ Client.sendPath = function(path,action,finalOrientation){
 Client.sendChat = function(txt){
     // Send the text that the player wants to say
     if(!txt.length || txt.length > Game.maxChatLength) return;
-    Client.socket.emit('chat',txt);
+    Client.channel.push('player:chat',txt);
 };
 
 Client.sendRevive = function(){
     // Signal the server that the player wants to respawn
-    Client.socket.emit('revive');
+    Client.channel.push('player:revive');
 };
 
 Client.deletePlayer = function(){
     // Signal the server that the player wants to delete his character
-    Client.socket.emit('delete',{id:Client.getPlayerID()});
+    Client.channel.push('player:delete',{player_id:Client.getPlayerID()});
     localStorage.clear();
 };
 
