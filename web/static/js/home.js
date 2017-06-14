@@ -3,34 +3,37 @@ import Game from "./game"
 import Client from "./client"
 
 var Home = {
-    maxNameLength : 20 // max length of the name of the player
+    maxNameLength : 20, // max length of the name of the player
+    game : null
 };
 
 Home.init = function(game){
-    if(game.device.desktop == false){
+    Home.game = game;
+
+    if(Home.game.device.desktop == false){
         console.log('W : '+window.screen.width+', H : '+window.screen.height);
-        if(Math.min(window.screen.width,window.screen.height) < game.width) { // If at least one of the two screen dimensions is smaller for the game, enable asking for device reorientation
-            game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
-            game.scale.forceOrientation(true,false);
+        if(Math.min(window.screen.width,window.screen.height) < Home.game.width) { // If at least one of the two screen dimensions is smaller for the game, enable asking for device reorientation
+            Home.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+            Home.game.scale.forceOrientation(true,false);
         }
     }
-    game.scale.pageAlignHorizontally = true;
-    game.add.plugin(Fabrique.Plugins.InputField); // https://github.com/orange-games/phaser-input
-    Game.isNewPlayer = Client.isNewPlayer();
+    Home.game.scale.pageAlignHorizontally = true;
+    Home.game.add.plugin(Fabrique.Plugins.InputField); // https://github.com/orange-games/phaser-input
+    Home.game.isNewPlayer = Client.isNewPlayer();
 };
 
 Home.preload = function(){
-    game.load.atlasJSONHash('atlas1', 'sprites/atlas1.png', 'sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
-    game.load.atlasJSONHash('atlas3', 'sprites/atlas3.png', 'sprites/atlas3.json'); // Items, weapons, armors
-    game.load.json('db', 'assets/json/db.json');
+    Home.game.load.atlasJSONHash('atlas1', 'sprites/atlas1.png', 'sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
+    Home.game.load.atlasJSONHash('atlas3', 'sprites/atlas3.png', 'sprites/atlas3.json'); // Items, weapons, armors
+    Home.game.load.json('db', 'assets/json/db.json');
 };
 
 Home.create = function(){
-    Game.db = game.cache.getJSON('db');
-    if(game.device.desktop == false)
+    Game.db = Home.game.cache.getJSON('db');
+    if(Home.game.device.desktop == false)
     {
-        game.scale.enterIncorrectOrientation.add(Game.displayOrientationScreen, this);
-        game.scale.leaveIncorrectOrientation.add(Game.removeOrientationScreen, this);
+        Home.game.scale.enterIncorrectOrientation.add(Game.displayOrientationScreen, this);
+        Home.game.scale.leaveIncorrectOrientation.add(Game.removeOrientationScreen, this);
     }
     if(!Game.isNewPlayer) Home.makeResetScroll();
     Home.displayHomeScroll();
@@ -47,10 +50,10 @@ Home.displayHomeScroll = function(){
 };
 
 Home.displayLogo = function(){
-    Home.logo = game.add.sprite(0, 20, 'atlas1', 'logo');
+    Home.logo = Home.game.add.sprite(0, 20, 'atlas1', 'logo');
     Home.logo.anchor.set(0.5,0);
-    Home.logo.x = game.width/2;
-    Home.logo.hideTween = game.add.tween(Home.logo);
+    Home.logo.x = Home.game.width/2;
+    Home.logo.hideTween = Home.game.add.tween(Home.logo);
     Home.logo.hideTween.to({alpha: 0}, Phaser.Timer.SECOND*0.2);
 };
 
@@ -64,7 +67,7 @@ Home.makeLink = function(x,text,callback,hyphen){
     var color = '#b2af9b';
     var style = {font: '18px pixel',fill:color};
     var y = 430;
-    var link = game.add.text(x,y,text,style);
+    var link = Home.game.add.text(x,y,text,style);
     link.inputEnabled = true;
     link.events.onInputOver.add(function(txt){
         txt.addColor('#f4d442',0);
@@ -74,18 +77,18 @@ Home.makeLink = function(x,text,callback,hyphen){
     }, this);
     link.events.onInputDown.add(callback, this);
     if(hyphen) {
-        var hyphen = game.add.text(link.x+link.width+10,y,' - ',style);
+        var hyphen = Home.game.add.text(link.x+link.width+10,y,' - ',style);
         return hyphen.x;
     }
     return link.x;
 };
 
 Home.makeScroll = function(){
-    var scroll = game.add.sprite(0,0,'atlas1','scroll_1');
-    scroll.x = game.width/2 - scroll.width/2;
-    scroll.y = game.height/2 - scroll.height/2;
-    scroll.addChild(game.add.sprite(-78,0,'atlas1','scroll_3'));
-    scroll.addChild(game.add.sprite(scroll.width,0,'atlas1','scroll_2'));
+    var scroll = Home.game.add.sprite(0,0,'atlas1','scroll_1');
+    scroll.x = Home.game.width/2 - scroll.width/2;
+    scroll.y = Home.game.height/2 - scroll.height/2;
+    scroll.addChild(Home.game.add.sprite(-78,0,'atlas1','scroll_3'));
+    scroll.addChild(Home.game.add.sprite(scroll.width,0,'atlas1','scroll_2'));
     scroll.fixedToCamera = true;
     scroll.alpha = 0;
     scroll.visible = false;
@@ -94,8 +97,8 @@ Home.makeScroll = function(){
 
 Home.setFadeTweens = function(element){
     var speedCoef = 0.2;
-    element.showTween = game.add.tween(element);
-    element.hideTween = game.add.tween(element);
+    element.showTween = Home.game.add.tween(element);
+    element.hideTween = Home.game.add.tween(element);
     element.showTween.to({alpha: 1}, Phaser.Timer.SECOND*speedCoef);
     element.hideTween.to({alpha: 0}, Phaser.Timer.SECOND*speedCoef);
     element.hideTween.onComplete.add(function(){
@@ -113,9 +116,9 @@ Home.makeHomeScroll = function(){
     var buttonY;
     var player;
     if(Game.isNewPlayer){
-        player = Home.scroll.addChild(game.add.sprite(0, 110, 'atlas3', 'clotharmor_31'));
+        player = Home.scroll.addChild(Home.game.add.sprite(0, 110, 'atlas3', 'clotharmor_31'));
         player.alpha = 0.5;
-        Home.inputField = Home.scroll.addChild(game.add.inputField(185, 160,{
+        Home.inputField = Home.scroll.addChild(Home.game.add.inputField(185, 160,{
             width: 300,
             padding: 10,
             fill: '#000',
@@ -134,11 +137,11 @@ Home.makeHomeScroll = function(){
         Home.inputField.input.useHandCursor = false;
         buttonY = 220;
     }else {
-        player = Home.scroll.addChild(game.add.sprite(0, 100, 'atlas3', Client.getArmor()+'_31'));
+        player = Home.scroll.addChild(Home.game.add.sprite(0, 100, 'atlas3', Client.getArmor()+'_31'));
         var wpn = Client.getWeapon();
-        var weapon = player.addChild(game.add.sprite(0, 0, 'atlas3', wpn+'_31'));
+        var weapon = player.addChild(Home.game.add.sprite(0, 0, 'atlas3', wpn+'_31'));
         weapon.position.set(Game.db.items[wpn].offsets.x, Game.db.items[wpn].offsets.y);
-        var name = player.addChild(game.add.text(0,42, Client.getName(), {
+        var name = player.addChild(Home.game.add.text(0,42, Client.getName(), {
             font: '18px pixel',
             fill: "#fff",
             stroke: "#000000",
@@ -148,7 +151,7 @@ Home.makeHomeScroll = function(){
         Home.makeScrollLink(Home.scroll,'Reset your character',Home.displayResetScroll);
         buttonY = 180;
     }
-    player.addChild(game.add.sprite(0,5, 'atlas1','shadow'));
+    player.addChild(Home.game.add.sprite(0,5, 'atlas1','shadow'));
     player.anchor.set(0.25,0.35);
     Home.button = Home.makeButton(Home.scroll,buttonY,'play',Home.startGame);
     if(Game.isNewPlayer) Home.disableButton();
@@ -157,7 +160,7 @@ Home.makeHomeScroll = function(){
 
 Home.makeTitle = function(scroll,txt){
     var titleY = 65;
-    var title = scroll.addChild(game.add.text(0, titleY, txt,{
+    var title = scroll.addChild(Home.game.add.text(0, titleY, txt,{
         font: '18px pixel',
         fill: "#f4d442",
         stroke: "#000000",
@@ -165,12 +168,12 @@ Home.makeTitle = function(scroll,txt){
     }));
     title.x = scroll.width/2;
     title.anchor.set(0.5);
-    scroll.addChild(game.add.sprite(title.x - 170,titleY-12,'atlas1','stache_0'));
-    scroll.addChild(game.add.sprite(title.x + 105,titleY-12,'atlas1','stache_1'));
+    scroll.addChild(Home.game.add.sprite(title.x - 170,titleY-12,'atlas1','stache_0'));
+    scroll.addChild(Home.game.add.sprite(title.x + 105,titleY-12,'atlas1','stache_1'));
 };
 
 Home.makeButton = function(scroll,buttonY,frame,callback){
-    var button = scroll.addChild(game.add.button(210,buttonY, 'atlas1',callback, this, frame+'_0', frame+'_0', frame+'_1'));
+    var button = scroll.addChild(Home.game.add.button(210,buttonY, 'atlas1',callback, this, frame+'_0', frame+'_0', frame+'_1'));
     button.x = scroll.width/2;
     button.anchor.set(0.5,0);
     button.input.useHandCursor = false;
@@ -178,7 +181,7 @@ Home.makeButton = function(scroll,buttonY,frame,callback){
 };
 
 Home.makeScrollLink = function(scroll,text,callback){
-    var link = scroll.addChild(game.add.text(0,310,text,{
+    var link = scroll.addChild(Home.game.add.text(0,310,text,{
         font: '16px pixel',
         fill: "#fff",
         stroke: "#000",
@@ -208,7 +211,7 @@ Home.makeResetScroll = function(){
     Home.resetScroll = Home.makeScroll();
     Home.setFadeTweens(Home.resetScroll);
     Home.makeTitle(Home.resetScroll,'Reset your character?');
-    var txt = Home.resetScroll.addChild(game.add.text(0,135,'All your progress will be lost. Are you sure?',{
+    var txt = Home.resetScroll.addChild(Home.game.add.text(0,135,'All your progress will be lost. Are you sure?',{
         font: '18px pixel',
         fill: "#000"
     }));
@@ -241,7 +244,7 @@ Home.startGame = function(){
     if(ok) {
         document.onkeydown = null;
         Home.scroll.hideTween.onComplete.add(function(){
-            game.state.start('Game');
+            Home.game.state.start('Game');
         },this);
         Home.scroll.hideTween.start();
         Home.logo.hideTween.start();
