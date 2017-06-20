@@ -1,6 +1,6 @@
-/**
- * Created by Jerome on 25-02-17.
- */
+
+import Being from './Being'
+import Game from './game'
 
 function Human(x,y,key){
     // Child of Being, parent of NPC and Player (the common aspect being the handling of speech bubbles)
@@ -68,3 +68,5 @@ Human.prototype.displayBubble = function(text){
 Human.prototype.killBubble = function(){
     this.bubble.kill();
 };
+
+export default Human

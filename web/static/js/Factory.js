@@ -21,3 +21,5 @@ Factory.prototype.setUp = function(sprite,x,y,key){
     sprite.revive();
     return sprite;
 };
+
+export default Factory

@@ -1,12 +1,11 @@
-/**
- * Created by Jerome on 25-02-17.
- */
 
+import Home from './home'
+import Game from './game'
 
 function Item(x,y,key){
     // key is a string indicating the atlas to use for the texture
-    Phaser.Sprite.call(this, game, x,y,key); // Call to constructor of parent
-    game.add.existing(this);
+    Phaser.Sprite.call(this, Home.game, x,y,key); // Call to constructor of parent
+    Home.game.add.existing(this);
     this.events.onKilled.addOnce(function(item){
         item.recycle();
     },this);
@@ -29,9 +28,9 @@ Item.prototype.setUp = function(content,chest,inChest,visible,respawn,loot){
 
 Item.prototype.display = function(){
     this.absorbProperties(Game.itemsInfo[this.content]);
-    if(!this.shadow) this.shadow = this.addChild(game.add.sprite(1, 0, 'atlas1','shadow'));
+    if(!this.shadow) this.shadow = this.addChild(Home.game.add.sprite(1, 0, 'atlas1','shadow'));
     if(!this.sparks) {
-        this.sparks = this.addChild(game.add.sprite(0,0, 'atlas1','sparks_0'));
+        this.sparks = this.addChild(Home.game.add.sprite(0,0, 'atlas1','sparks_0'));
         this.sparks.animations.add('glitter', Phaser.Animation.generateFrameNames('sparks_', 0, 5), 10, true);
     }
     this.sparks.animations.play('glitter');
@@ -56,7 +55,7 @@ Item.prototype.display = function(){
 };
 
 Item.prototype.setBlinkingTween = function(){
-    var tween = game.add.tween(this);
+    var tween = Home.game.add.tween(this);
     this.blinkingTween = tween;
     var blinks = 0;
     // will blink every 200ms, 20 times (4 sec), after a delay of sec
@@ -126,3 +125,5 @@ Item.prototype.respawn = function(){
         Game.fadeInTween(this);
     }
 };
+
+export default Item

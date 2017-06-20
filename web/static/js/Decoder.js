@@ -167,3 +167,5 @@ Decoder.decodeString = function(view,length,offset) { // Read length bytes start
     }
     return chars.join('');
 };
+
+export default Decoder

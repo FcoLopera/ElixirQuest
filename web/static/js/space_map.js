@@ -1,6 +1,3 @@
-/**
- * Created by Jerome on 09-11-16.
- */
 
 // A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
 // that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position.
@@ -96,3 +93,4 @@ if (typeof window === 'undefined') {
     module.exports.spaceMap = spaceMap;
 }
 
+export default spaceMap

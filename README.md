@@ -1,6 +1,6 @@
 # Elixirquest
 
-Phaser Quest is a reproduction of Mozilla's [Browserquest](http://browserquest.mozilla.org/) using the following tools:
+Elixir Quest is a reproduction of Mozilla's [Browserquest](http://browserquest.mozilla.org/) using the following tools:
 - The [Phaser](https://phaser.io/) framework for the client
 - [Phoenixframework](http://www.phoenixframework.org/) for the server and client-server communication
 

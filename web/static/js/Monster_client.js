@@ -1,18 +1,17 @@
-/**
- * Created by Jerome on 25-02-17.
- */
-
+import Being from './Being'
+import Game from './game'
+import Home from './home'
 
 function Monster(x,y,key){
     // key is a string indicating the atlas to use for the texture
     Being.call(this,x,y,key);
     this.isPlayer = false;
-    this.addChild(game.add.sprite(0,0, 'atlas1','shadow'));
+    this.addChild(Home.game.add.sprite(0,0, 'atlas1','shadow'));
     Game.setHoverCursors(this,Game.fightCursor);
     this.inputEnabled = true;
     this.events.onInputUp.add(Game.handleMonsterClick, this);
     this.inFight = false;
-    this.orientation = game.rnd.between(1,4);
+    this.orientation = Home.game.rnd.between(1,4);
     this.initialPosition = new Phaser.Point(x,y);
 }
 Monster.prototype = Object.create(Being.prototype);
@@ -47,7 +46,7 @@ Monster.prototype.prepareMovement = function(path,action,delta){
 // fight and fightAction: see the equicalents in Player
 Monster.prototype.fight = function(){
     this.inFight = true;
-    this.fightTween = game.add.tween(this);
+    this.fightTween = Home.game.add.tween(this);
     this.fightTween.to({}, Phaser.Timer.SECOND, null, false, 150, -1); // Small delay to allow the player to finish his movement, -1 for looping
     this.fightTween.onStart.add(function(){this.fightAction();}, this);
     this.fightTween.onLoop.add(function(){this.fightAction();}, this);
@@ -84,9 +83,11 @@ Monster.prototype.die = function(animate){
 
 Monster.prototype.respawn = function(){
     this.revive(); // method from the Phaser Sprite class
-    this.orientation = game.rnd.between(1,4);
+    this.orientation = Home.game.rnd.between(1,4);
     this.position.set(this.initialPosition.x,this.initialPosition.y);
     this.life = this.maxLife;
     this.idle(true);
     Game.fadeInTween(this);
 };
+
+export default Monster

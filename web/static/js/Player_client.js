@@ -1,6 +1,8 @@
-/**
- * Created by Jerome on 25-02-17.
- */
+
+import Human from './Human'
+import Game from './game'
+import Home from './home'
+import Client from './client'
 
 function Player(x,y,key){
     // key is a string indicating the atlas to use as texture
@@ -14,25 +16,25 @@ function Player(x,y,key){
     this.inFight = false;
     this.defaultFrames = {
         // the third value is the frame to come back to at the end of the animation
-        "attack_right": [0,4,9],
-        "right": [5, 8],
-        "idle_right": [9, 10],
-        "attack_up": [11,15,20],
-        "up": [16, 19],
-        "idle_up": [20, 21],
-        "attack_down": [22,26,31],
-        "down": [27, 30],
-        "idle_down": [31, 32],
-        "attack_left": [33,37,42],
-        "left": [38, 41],
-        "idle_left": [42, 43]
+        'attack_right': [0,4,9],
+        'right': [5, 8],
+        'idle_right': [9, 10],
+        'attack_up': [11,15,20],
+        'up': [16, 19],
+        'idle_up': [20, 21],
+        'attack_down': [22,26,31],
+        'down': [27, 30],
+        'idle_down': [31, 32],
+        'attack_left': [33,37,42],
+        'left': [38, 41],
+        'idle_left': [42, 43]
     };
-    this.addChild(this.weapon = game.add.sprite(0,0,'atlas3'));
-    this.addChild(this.shadow = game.add.sprite(0,5, 'atlas1','shadow'));
-    this.addChild(this.nameHolder = game.add.text(0,-30, '', {
+    this.addChild(this.weapon = Home.game.add.sprite(0,0,'atlas3'));
+    this.addChild(this.shadow = Home.game.add.sprite(0,5, 'atlas1','shadow'));
+    this.addChild(this.nameHolder = Home.game.add.text(0,-30, '', {
         font: '14px pixel',
-        fill: "#ffffff",
-        stroke: "#000000",
+        fill: '#ffffff',
+        stroke: '#000000',
         strokeThickness: 2
     }));
     this.events.onKilled.add(function(player){
@@ -44,7 +46,7 @@ Player.prototype.constructor = Player;
 
 Player.prototype.setIsPlayer = function(flag){ // sets the isPlayer flag to true or false to indicate if a sprite is the main player or another player
     this.isPlayer = flag;
-    if(this.isPlayer) this.nameHolder.addColor("#f4d442",0);
+    if(this.isPlayer) this.nameHolder.addColor('#f4d442',0);
 };
 
 Player.prototype.setName = function(name) {
@@ -113,8 +115,8 @@ Player.prototype.equipArmor = function(key){
 Player.prototype.updateLife = function(){ // Update the life bar to reflect the amout of health of the player
     if(this.life < 0) this.life = 0;
     var width = Game.computeLifeBarWidth();
-    var tweenWidth = game.add.tween(Game.health.getChildAt(0)); // tween for the "body" of the bar
-    var tweenEnd = game.add.tween(Game.health.getChildAt(1)); // tween for the curved tip
+    var tweenWidth = Home.game.add.tween(Game.health.getChildAt(0)); // tween for the "body" of the bar
+    var tweenEnd = Home.game.add.tween(Game.health.getChildAt(1)); // tween for the curved tip
     tweenWidth.to({width: width }, 200,null, false, 200);
     tweenEnd.to({x: width }, 200,null, false, 200);
     tweenWidth.start();
@@ -129,8 +131,8 @@ Player.prototype.teleport = function(){
         if(this.isPlayer) {
             if (door.camera && !door.follow) { // if the camera cannot follow the player but has to be fixed at specific coordinates
                 Game.unfollowPlayer();
-                game.camera.x = door.camera.x;
-                game.camera.y = door.camera.y;
+                Home.game.camera.x = door.camera.x;
+                Home.game.camera.y = door.camera.y;
             } else if(door.follow) { // if the camera can follow, but indoors and within possible bounds
                 Game.followPlayerIndoors(door.min_cx,door.min_cy,door.max_cx,door.max_cy);
             }else{
@@ -152,7 +154,7 @@ Player.prototype.fight = function(){
     // Sets the player in "fight mode", and start a tween that calls fightAction() regularly in order to display the attack animations
     if(!this.target) return;
     this.inFight = true;
-    this.fightTween = game.add.tween(this);
+    this.fightTween = Home.game.add.tween(this);
     this.fightTween.to({}, Phaser.Timer.SECOND, null, false, 0, -1);
     this.fightTween.onStart.add(function(){this.fightAction();}, this);
     this.fightTween.onLoop.add(function(){this.fightAction();}, this);
@@ -194,10 +196,12 @@ Player.prototype.die = function(animate){
 
 Player.prototype.respawn = function(){
     this.revive(); // method from the Phaser Sprite class
-    this.orientation = game.rnd.between(1,4);
+    this.orientation = Home.game.rnd.between(1,4);
     if(this.isPlayer) {
         this.life = this.maxLife;
         this.updateLife();
     }
     this.idle(true);
 };
+
+export default Player

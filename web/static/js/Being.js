@@ -1,10 +1,7 @@
-/**
- * Created by Jerome on 14-10-16.
- */
-/*
- * Author: Jerome Renaux
- * E-mail: jerome.renaux@gmail.com
- */
+
+import Home from './home'
+import Game from './game'
+
 // Helper function to make a sprite object absorb all the properties of a provided JSON object; Object.assign() should work as well
 Phaser.Sprite.prototype.absorbProperties = function(object){
     for (var key in object) {
@@ -16,10 +13,10 @@ Phaser.Sprite.prototype.absorbProperties = function(object){
 // Being is the topmost class encompassing all "living" sprites, be it players, NPC or monsters (not items)
 function Being(x,y,key){
     // key is the string indicating which atlas to use
-    Phaser.Sprite.call(this, game, x,y,key); // Call to constructor of parent
+    Phaser.Sprite.call(this, Home.game, x,y,key); // Call to constructor of parent
     this.speed = 0;
     this.destination = null;
-    game.add.existing(this);
+    Home.game.add.existing(this);
 }
 Being.prototype = Object.create(Phaser.Sprite.prototype); // Declares the inheritance relationship
 Being.prototype.constructor = Being;
@@ -42,9 +39,9 @@ Being.prototype.setAnimations = function(object){
         framePrefix = (object instanceof Monster ? this.monsterName : this.armorName);
     }
     var rates = { // Rates of the different kinds of animations
-      "": 8,
-      "idle_": (frames.hasOwnProperty('idle_rate') ? frames.idle_rate : 2),
-      "attack_": 14
+      '': 8,
+      'idle_': (frames.hasOwnProperty('idle_rate') ? frames.idle_rate : 2),
+      'attack_': 14
     };
     var deathframes;
     if(frames.hasOwnProperty('death')) { // Fetch death animation, or make a default one
@@ -174,7 +171,7 @@ Being.prototype.move = function(path,finalOrientation,action,delta){
         x_steps.push(path[q].x*Game.map.tileWidth);
         y_steps.push(path[q].y*Game.map.tileWidth);
     }
-    var tween = game.add.tween(this);
+    var tween = Home.game.add.tween(this);
     this.lastOrientationCheck = 0; // timestamp at which the orientation of the sprite was checked for the last time
     var duration = Math.ceil(Math.max(1,path.length*this.speed - delta)); // duration of the movement, based on player speed, path length and latency
     tween.to({x: x_steps,y:y_steps}, duration);
@@ -277,3 +274,5 @@ Being.prototype.delayedKill = function(delay){
         _being.kill();
     },delay,this);
 };
+
+export default Being

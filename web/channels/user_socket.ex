@@ -2,7 +2,7 @@ defmodule Elixirquest.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", Elixirquest.RoomChannel
+  channel "world:*", Elixirquest.WorldChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

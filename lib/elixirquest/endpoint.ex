@@ -9,7 +9,7 @@ defmodule Elixirquest.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/", from: :elixirquest, gzip: false,
-    only: ~w(css fonts images audio tilesets maps sprites js favicon.ico robots.txt)
+    only: ~w(css fonts images audio tilesets maps sprites js json favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

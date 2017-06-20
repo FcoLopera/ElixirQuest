@@ -1,6 +1,6 @@
 
-import Game from "./game"
-import Client from "./client"
+import Game from './game'
+import Client from './client'
 
 var Home = {
     maxNameLength : 20, // max length of the name of the player
@@ -25,7 +25,7 @@ Home.init = function(game){
 Home.preload = function(){
     Home.game.load.atlasJSONHash('atlas1', 'sprites/atlas1.png', 'sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
     Home.game.load.atlasJSONHash('atlas3', 'sprites/atlas3.png', 'sprites/atlas3.json'); // Items, weapons, armors
-    Home.game.load.json('db', 'assets/json/db.json');
+    Home.game.load.json('db', 'json/db.json');
 };
 
 Home.create = function(){
@@ -143,8 +143,8 @@ Home.makeHomeScroll = function(){
         weapon.position.set(Game.db.items[wpn].offsets.x, Game.db.items[wpn].offsets.y);
         var name = player.addChild(Home.game.add.text(0,42, Client.getName(), {
             font: '18px pixel',
-            fill: "#fff",
-            stroke: "#000000",
+            fill: '#fff',
+            stroke: '#000000',
             strokeThickness: 3
         }));
         name.x = Math.floor(12 - (name.width/2));
@@ -162,8 +162,8 @@ Home.makeTitle = function(scroll,txt){
     var titleY = 65;
     var title = scroll.addChild(Home.game.add.text(0, titleY, txt,{
         font: '18px pixel',
-        fill: "#f4d442",
-        stroke: "#000000",
+        fill: '#f4d442',
+        stroke: '#000000',
         strokeThickness: 3
     }));
     title.x = scroll.width/2;
@@ -183,8 +183,8 @@ Home.makeButton = function(scroll,buttonY,frame,callback){
 Home.makeScrollLink = function(scroll,text,callback){
     var link = scroll.addChild(Home.game.add.text(0,310,text,{
         font: '16px pixel',
-        fill: "#fff",
-        stroke: "#000",
+        fill: '#fff',
+        stroke: '#000',
         strokeThickness: 3
     }));
     link.x = scroll.width/2;
@@ -213,7 +213,7 @@ Home.makeResetScroll = function(){
     Home.makeTitle(Home.resetScroll,'Reset your character?');
     var txt = Home.resetScroll.addChild(Home.game.add.text(0,135,'All your progress will be lost. Are you sure?',{
         font: '18px pixel',
-        fill: "#000"
+        fill: '#000'
     }));
     Home.makeButton(Home.resetScroll,180,'delete',Home.deletePlayer);
     txt.anchor.set(0.5);

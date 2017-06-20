@@ -1,6 +1,7 @@
 
 import {Socket} from 'phoenix'
 import Game from './game'
+import Decoder from "./Decoder"
 
 var Client = {
     eventsQueue : [], // when events arrive before the flag playerIsInitialized is set to true, they are not processed
@@ -24,8 +25,9 @@ Client.socket.onClose( e => console.log('CLOSE', e))
 
 //channel creation
 Client.channel = Client.socket.channel('world:common', {})
-Client.channel.join().receive('ignore', () => console.log('auth error'))
-           .receive('ok', () => console.log('join ok'))
+Client.channel.join()
+      .receive('ok', () => console.log('join ok'))
+      .receive("error", resp => { console.log("Unable to join", resp) })
            //.after(10000, () => console.log('Connection interruption'))
 
 //channel logging

@@ -1,6 +1,6 @@
 
-import Home from "./home"
-import Game from "./game"
+import Home from './home'
+import Game from './game'
 
 var elixirquest = new Phaser.Game(980, 500,
     (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? Phaser.CANVAS : Phaser.AUTO),
