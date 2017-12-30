@@ -1,7 +1,7 @@
 
 import {Socket} from 'phoenix'
 import Game from './game'
-import Decoder from "./Decoder"
+import Decoder from './Decoder'
 
 var Client = {
     eventsQueue : [], // when events arrive before the flag playerIsInitialized is set to true, they are not processed
@@ -19,15 +19,15 @@ Client.socket = new Socket('/socket', {params: {token: window.userToken, user_id
 Client.socket.connect();
 
 //socket logging
-Client.socket.onOpen( ev => console.log('OPEN', ev) )
-Client.socket.onError( ev => console.log('ERROR', ev) )
-Client.socket.onClose( e => console.log('CLOSE', e))
+Client.socket.onOpen( e => console.log('socket OPEN', e))
+Client.socket.onError( e => console.log('socket ERROR', e))
+Client.socket.onClose( e => console.log('socket CLOSE', e))
 
 //channel creation
 Client.channel = Client.socket.channel('world:common', {})
 Client.channel.join()
       .receive('ok', () => console.log('join ok'))
-      .receive("error", resp => { console.log("Unable to join", resp) })
+      .receive('error', resp => { console.log('Unable to join', resp) })
            //.after(10000, () => console.log('Connection interruption'))
 
 //channel logging
@@ -55,7 +55,7 @@ Client.channel.onClose(e => console.log('channel closed', e))
   };
 */
 Client.requestData = function(){ // request the data to be used for initWorld()
-    Client.channel.push('client:init-world',Client.getInitRequest());
+    Client.channel.push('client:init-world', Client.getInitRequest());
 };
 
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
