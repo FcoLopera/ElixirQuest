@@ -11,10 +11,11 @@ var Client = {
     storageIDKey: 'playerID' // key in 0 of player ID
 };
 
-//TODO Make use of the example https://github.com/chrismccord/phoenix_chat_example/blob/master/web/static/js/app.js for implement the protocol
+//TODO: Make use of the example https://github.com/chrismccord/phoenix_chat_example/blob/master/web/static/js/app.js for implement the protocol
 
-// socket creation
-Client.socket = new Socket('/socket', {params: {token: window.userToken, user_id: '123'}})
+// socket creation user_id should be random for now
+Client.user_id = Math.floor(Math.random() * 1000)
+Client.socket = new Socket('/socket', {params: {token: window.userToken, user_id: Client.user_id}})
 
 Client.socket.connect();
 

@@ -7,6 +7,7 @@ defmodule Elixirquest.Game.Server do
 
   def start_link do
     GenServer.start_link(__MODULE__, [])
+    #  GenServer.start_link(__MODULE__, id, name: ref(id))
   end
 
   def add_message(pid, message) do
@@ -18,10 +19,10 @@ defmodule Elixirquest.Game.Server do
   end
 
   # SERVER
-
+  @impl true
   def init(_) do
-    {:ok, map} = TiledMap.load_json_map(Path.join(:code.priv_dir(:elixirquest), "static/maps/minimap_server.json"))
-
+    #{:ok, map} = TiledMap.load_json_map(Path.join(:code.priv_dir(:elixirquest), "static/maps/minimap_server.json"))
+    {:ok, map} = load_json("static/maps/minimap_server.json")
     {:ok, db} = load_json("static/json/db.json") #Info about monsters, items, etc.
     {:ok, server_entities} = load_json("static/json/entities_server.json") # locations of monsters, objects, chests...
     {:ok, client_entities} = load_json("static/json/entities_client.json") # npc
@@ -29,7 +30,9 @@ defmodule Elixirquest.Game.Server do
     entities = Map.merge(server_entities, client_entities)
     items_id_map = Enum.map(db["items"], fn {key, properties} -> { properties["id"], key} end)
 
-    IO.puts(inspect items_id_map)
+    #%{"layers" => layers} = map
+
+    IO.puts(inspect Enum.count(map["layers"]))
 
     state=%{
       map: map, # object containing all the data about the world map
@@ -54,30 +57,32 @@ defmodule Elixirquest.Game.Server do
       nbConnectedChanged: false, # has the number of connected players changed since last update packet or not
       players: %{}, # map of all connected players, fetchable by id
       socketMap: %{}, # map of socket id's to the player id's of the associated players
-      IDmap: %{}, # map of player id's to their mongo db uid's
+      IDmap: %{}, # map of player id's to their db uid's
 
       db: db,
       entities: entities,
       items_id_map: items_id_map
     }
 
+    IO.puts("Gameserver starts...")
+
     {:ok, state}
   end
 
+  @impl true
   def handle_cast({:add_message, new_message}, messages) do
     {:noreply, [new_message | messages]}
   end
 
+  @impl true
   def handle_call(:get_messages, _from, messages) do
     {:reply, messages, messages}
   end
 
   # helpers
-
   def load_json(static_path) do
     {:ok, body} = File.read(Path.join(:code.priv_dir(:elixirquest), static_path))
     Poison.decode(body)
   end
-
 
 end

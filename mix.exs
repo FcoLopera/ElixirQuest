@@ -5,7 +5,7 @@ defmodule Elixirquest.Mixfile do
     [
       app: :elixirquest,
       version: "0.0.1",
-      elixir: "~> 1.5.1",
+      elixir: "~> 1.9.1",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       build_embedded: Mix.env == :prod,
@@ -44,7 +44,8 @@ defmodule Elixirquest.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:poison, "~> 2.0"},
-      {:tiled_map, "~> 0.0.1"}
+      {:tiled_map, "~> 0.0.1"},
+      {:pathfinding, "~> 0.1.0"}
     ]
   end
 

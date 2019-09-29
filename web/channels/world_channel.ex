@@ -1,5 +1,7 @@
 defmodule Elixirquest.WorldChannel do
   use Phoenix.Channel
+
+  alias Elixirquest.Game.Supervisor, as: GameSupervisor
   require Logger
 
   def join("world:common", message, socket) do
@@ -27,12 +29,24 @@ defmodule Elixirquest.WorldChannel do
     Logger.debug "-> Received Init World"
     Logger.debug "player data: "
     Logger.debug "-> #{inspect msg}"
+
+    worlds = GameSupervisor.current_worlds()
+    Logger.debug "Worlds -> #{inspect worlds}"
+
+    worldPid = if Enum.empty?(worlds) do
+      GameSupervisor.init_world()
+    else
+      Enum.at(worlds, 0)
+    end
+
+    Logger.debug "Worlds -> #{inspect worldPid}"
 #    TODO:
 #   getOrCreate game_server
 #   getOrCreate map
 #   if new_player check socket and add player to registry (https://medium.com/@naveennegi/domain-driven-design-in-elixir-4dc416ac0a36 using via)
 #   else if !check_player_id end else load_player
-#
+#  More on Phaserquest start from here
+#  - https://www.dynetisgames.com/2017/03/06/how-to-make-a-multiplayer-online-game-with-phaser-socket-io-and-node-js/
 
     push socket, "client:wait", %{}
     {:noreply, socket}
