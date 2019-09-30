@@ -2,6 +2,7 @@ defmodule Elixirquest.WorldChannel do
   use Phoenix.Channel
 
   alias Elixirquest.Game.Supervisor, as: GameSupervisor
+  alias Elixirquest.Game.World, as: World
   require Logger
 
   def join("world:common", message, socket) do
@@ -25,23 +26,34 @@ defmodule Elixirquest.WorldChannel do
     :ok
   end
 
-  def handle_in("client:init-world", msg, socket) do
+  def handle_in("client:init-world", %{"new" => is_new_player} = data, socket) do
     Logger.debug "-> Received Init World"
     Logger.debug "player data: "
-    Logger.debug "-> #{inspect msg}"
+    Logger.debug "-> #{inspect data}"
 
+#   Checks if a world exists in the supervisor, if not create one and returns its pid
     worlds = GameSupervisor.current_worlds()
-    Logger.debug "Worlds -> #{inspect worlds}"
-
     worldPid = if Enum.empty?(worlds) do
-      GameSupervisor.init_world()
+      {:ok, pid } = GameSupervisor.init_world()
+      pid
     else
-      Enum.at(worlds, 0)
+      {_, pid, _, _ } = Enum.at(worlds, 0)
+      pid
     end
 
     Logger.debug "Worlds -> #{inspect worldPid}"
+
+    if is_new_player do
+      Logger.debug "For the actual socket id #{inspect socket.assigns.socket_id}"
+      Logger.debug "Socket_is_free:#{inspect World.is_socket_free(worldPid, socket.assigns.socket_id)}"
+    else
+      player_id = data["id"]
+      Logger.debug "For the actual socket id of old player #{inspect socket.assigns.socket_id}"
+      Logger.debug "With player_id: #{inspect player_id}"
+      Logger.debug "Player_id_free:#{inspect "todo check player id from world"}"
+    end
+
 #    TODO:
-#   getOrCreate game_server
 #   getOrCreate map
 #   if new_player check socket and add player to registry (https://medium.com/@naveennegi/domain-driven-design-in-elixir-4dc416ac0a36 using via)
 #   else if !check_player_id end else load_player

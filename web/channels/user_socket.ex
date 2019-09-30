@@ -19,9 +19,9 @@ defmodule Elixirquest.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(%{"user_id" => user_id}, socket) do
-    IO.puts("==> socket connection with params:#{user_id}")
-    {:ok, socket}
+  def connect(%{"socket_id" => socket_id}, socket) do
+    IO.puts("=> socket connection with params:#{socket_id}")
+    {:ok, assign(socket, :socket_id, socket_id)}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
@@ -34,5 +34,7 @@ defmodule Elixirquest.UserSocket do
   #     Elixirquest.Endpoint.broadcast("users_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(_socket), do: nil
+  # def id(_socket), do: nil
+  def id(socket), do: "player_socket:#{socket.assigns.socket_id}"
+
 end

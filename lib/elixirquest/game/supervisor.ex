@@ -8,7 +8,7 @@ defmodule Elixirquest.Game.Supervisor do
 
   def init(_) do
     children = [
-      worker(Elixirquest.Game.Server, [], restart: :permanent)
+      worker(Elixirquest.Game.World, [], restart: :permanent)
     ]
     supervise(children, strategy: :simple_one_for_one)
   end
