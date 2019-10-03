@@ -14,6 +14,10 @@ defmodule Elixirquest.Game.World do
      GenServer.call(pid, {:is_socket_free, socket_id})
   end
 
+  def add_new_player(pid, player_data) do
+    IO.puts(player_data)
+  end
+
   # Example function for api
   def add_message(pid, message) do
     GenServer.cast(pid, {:add_message, message})

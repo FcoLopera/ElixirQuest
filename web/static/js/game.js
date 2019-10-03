@@ -438,7 +438,7 @@ Game.initWorld = function(data){ // Initialize the game world based on the serve
     // Destroy loading screen
     Game.loadingShade.destroy();
     Game.loadingText.destroy();
-    Game.messageIn((Game.isNewPlayer ? 'Welcome to PhaserQuest!' : 'Welcome back!' ));
+    Game.messageIn((Game.isNewPlayer ? 'Welcome to elixir_quest!' : 'Welcome back!' ));
 
     if(Game.isNewPlayer) Game.toggleHelp();
 };

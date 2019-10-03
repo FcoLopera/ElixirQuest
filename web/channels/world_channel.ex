@@ -33,7 +33,7 @@ defmodule Elixirquest.WorldChannel do
 
 #   Checks if a world exists in the supervisor, if not create one and returns its pid
     worlds = GameSupervisor.current_worlds()
-    worldPid = if Enum.empty?(worlds) do
+    world_pid = if Enum.empty?(worlds) do
       {:ok, pid } = GameSupervisor.init_world()
       pid
     else
@@ -41,11 +41,13 @@ defmodule Elixirquest.WorldChannel do
       pid
     end
 
-    Logger.debug "Worlds -> #{inspect worldPid}"
+    Logger.debug "Worlds -> #{inspect world_pid}"
 
     if is_new_player do
       Logger.debug "For the actual socket id #{inspect socket.assigns.socket_id}"
-      Logger.debug "Socket_is_free:#{inspect World.is_socket_free(worldPid, socket.assigns.socket_id)}"
+      Logger.debug "Socket_is_free:#{inspect World.is_socket_free(world_pid, socket.assigns.socket_id)}"
+      Logger.debug "Add player to world...: #{inspect World.add_new_player(world_pid,data)}"
+
     else
       player_id = data["id"]
       Logger.debug "For the actual socket id of old player #{inspect socket.assigns.socket_id}"
@@ -57,7 +59,7 @@ defmodule Elixirquest.WorldChannel do
 #   getOrCreate map
 #   if new_player check socket and add player to registry (https://medium.com/@naveennegi/domain-driven-design-in-elixir-4dc416ac0a36 using via)
 #   else if !check_player_id end else load_player
-#  More on Phaserquest start from here
+#  More on Elixir quest start from here
 #  - https://www.dynetisgames.com/2017/03/06/how-to-make-a-multiplayer-online-game-with-phaser-socket-io-and-node-js/
 
     push socket, "client:wait", %{}

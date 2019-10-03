@@ -1197,7 +1197,7 @@
       "atlasKey": "villagegirl",
       "nbFrames": 2,
       "dialogue": [
-        "Enjoy this game made with Phaser, Node.js and Socket.io!",
+        "Enjoy this game made with Phaser, Elixir and Phoenix framework!",
         "Check the blog out if you want to learn more."
       ]
     },
