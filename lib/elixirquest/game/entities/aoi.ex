@@ -17,4 +17,5 @@ defmodule Elixirquest.Game.Aoi do
 
 #TODO: should create aoi as agents to store status for each of the corresponding
 # aoi in the game
+
 end

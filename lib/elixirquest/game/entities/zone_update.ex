@@ -79,15 +79,15 @@ end
 # Get updates about all entities present in the list of AOIs
 def syncrhonize(zone_update, aoi) do
   # don't send the trimmed version, the trim is done in adObject()
-  List.fold(aoi.entities, zone_update, fn (entity, acc) -> ZoneUpdate.add_object(acc, entity) end)
+  List.foldl(aoi.entities, zone_update, fn (entity, acc) -> Elixirquest.Game.ZoneUpdate.add_object(acc, entity) end)
 end
 
 def is_empty(%{:new_players => new_players} = _zone_update)   when length(new_players)  > 0, do: false
 def is_empty(%{:new_monsters => new_monsters} = _zone_update) when length(new_monsters) > 0, do: false
 def is_empty(%{:disconnected => disconnected} = _zone_update) when length(disconnected) > 0, do: false
-def is_empty(%{:players => players} = _zone_update)           when map_size(players)      > 0, do: false
-def is_empty(%{:items => items} = _zone_update)               when map_size(items)        > 0, do: false
-def is_empty(%{:monsters => monsters} = _zone_update)         when map_size(monsters)     > 0, do: false
+def is_empty(%{:players => players} = _zone_update)           when map_size(players)    > 0, do: false
+def is_empty(%{:items => items} = _zone_update)               when map_size(items)      > 0, do: false
+def is_empty(%{:monsters => monsters} = _zone_update)         when map_size(monsters)   > 0, do: false
 def is_empty(_zone_update), do: true
 
 # Auxiliary functions
