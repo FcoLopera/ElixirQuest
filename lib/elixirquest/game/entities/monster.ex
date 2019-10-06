@@ -4,6 +4,7 @@ defmodule Elixirquest.Game.Monster do
   """
 
   defstruct [
+    id: nil,
     x: 0,
     y: 0,
     size: 0,
